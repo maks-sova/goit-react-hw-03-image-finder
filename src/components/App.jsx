@@ -29,7 +29,7 @@ export class App extends React.Component {
   query = () => {
     try {
       fetch(
-        `https://pixabay.com/api/?q=${this.state.name}&page=${this.state.page}&key=32335865-69b3ae51a78e79767c682fcdb&q=yellow+flowers&image_type=photoorientation=horizontal&per_page=12`
+        `https://pixabay.com/api/?q=${this.state.name}&page=${this.state.page}&key=31147704-3d6790a6d451c63a87a2b7851&image_type=photo&orientation=horizontal&per_page=12`
       )
         .then(resp => resp.json())
         .then(resp => {
