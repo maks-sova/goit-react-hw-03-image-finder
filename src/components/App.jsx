@@ -1,9 +1,10 @@
 import { Component } from 'react';
-import ButtonLoaderMore from './Button/Button';
-import ImageGallery from './ImageGallery/ImageGallery';
-import Loader from './Loader/Loader';
-import Modal from './Modal/Modal';
-import Searchbar from './Searchbar/Searchbar';
+
+import Searchbar from 'components/Searchbar/Searchbar';
+import ImageGallery from 'components/ImageGallery/ImageGallery';
+import Modal from 'components/Modal/Modal';
+import Loader from 'components/Loader/Loader';
+import ButtonLoaderMore from 'components/Button/Button';
 
 import { searchImg } from 'services/image-api';
 import css from './styles.module.css';
@@ -73,17 +74,7 @@ class App extends Component {
     const totalPage = Math.ceil(total / 12);
 
     return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'block',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-          textAlign: 'center',
-        }}
-      >
+      <div>
         <Searchbar onSubmit={this.searchInput} />
         <ImageGallery onClick={this.modalOpen} gallery={gallery} />
 

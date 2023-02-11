@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import css from '../styles.module.css';
+
+import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 
 const ImageGallery = ({ gallery, onClick }) => {
   return (
@@ -11,11 +11,6 @@ const ImageGallery = ({ gallery, onClick }) => {
       </ul>
     </>
   );
-};
-
-ImageGallery.propTypes = {
-  gallery: PropTypes.array.isRequired,
-  onClick: PropTypes.func.isRequired,
 };
 
 export default ImageGallery;

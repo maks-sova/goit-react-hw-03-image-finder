@@ -1,5 +1,6 @@
 import React from 'react';
 import { Audio } from 'react-loader-spinner';
+
 import css from '../styles.module.css';
 
 const Loader = ({ text }) => {
@@ -9,9 +10,8 @@ const Loader = ({ text }) => {
         height="80"
         width="80"
         radius="9"
-        color="green"
-        ariaLabel="three-dots-loading"
-        wrapperStyle
+        color="blue"
+        ariaLabel="loading"
       />
       <h2 className={css.title}>{text}</h2>
     </div>
