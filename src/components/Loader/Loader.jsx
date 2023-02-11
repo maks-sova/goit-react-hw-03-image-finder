@@ -1,8 +1,8 @@
 import React from 'react';
 import { Audio } from 'react-loader-spinner';
-import css from './Loader.module.css';
+import css from '../styles.module.css';
 
-const Loader = () => {
+const Loader = ({ text }) => {
   return (
     <div className={css.loader}>
       <Audio
@@ -13,6 +13,7 @@ const Loader = () => {
         ariaLabel="three-dots-loading"
         wrapperStyle
       />
+      <h2 className={css.title}>{text}</h2>
     </div>
   );
 };

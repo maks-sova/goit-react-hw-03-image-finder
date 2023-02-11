@@ -1,52 +1,30 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import css from './Modal.module.css';
+import React, { Component } from 'react';
+import { createPortal } from 'react-dom';
+import css from '../styles.module.css';
+const modalRoot = document.querySelector('#modal--root');
 
-export class Modal extends React.Component {
-  state = {
-    isModalOpen: false,
-  };
-
-  static propTypes = {
-    currentImage: PropTypes.shape({
-      src: PropTypes.string.isRequired,
-      alt: PropTypes.string.isRequired,
-    }).isRequired,
-    resetCurrentImage: PropTypes.func.isRequired,
-  };
-
+class Modal extends Component {
   componentDidMount() {
-    this.setState({ isModalOpen: true });
-    window.addEventListener('keydown', this.closeModalWindow);
+    window.addEventListener('keydown', this.handelKeydown);
   }
-
-  componentWillUnmount() {
-    this.setState({ isModalOpen: false });
-    window.removeEventListener('keydown', this.closeModalWindow);
-  }
-
-  closeModalWindow = event => {
-    if (event.code === 'Escape') {
-      this.props.resetCurrentImage();
-    }
-    if (event.target === event.currentTarget) {
-      this.setState({ isModalOpen: false });
-      this.props.resetCurrentImage();
-    }
+  handelKeydown = e => {
+    this.props.onClose(e);
   };
+  handelClick = e => {
+    this.props.onClose(e);
+  };
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handelKeydown);
+  }
 
   render() {
-    return (
-      this.state.isModalOpen && (
-        <div className={css.overlay} onClick={this.closeModalWindow}>
-          <div className={css.modal}>
-            <img
-              src={this.props.currentImage.src}
-              alt={this.props.currentImage.alt}
-            />
-          </div>
-        </div>
-      )
+    return createPortal(
+      <div className={css.Overlay} onClick={this.handelClick}>
+        <div className={css.Modal}>{this.props.children}</div>
+      </div>,
+      modalRoot
     );
   }
 }
+
+export default Modal;

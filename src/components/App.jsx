@@ -1,86 +1,77 @@
-import React from 'react';
-import Searchbar from './Searchbar/Searchbar.jsx';
-import ImageGallery from './ImageGallery/ImageGallery.jsx';
-import Button from './Button/Button.jsx';
-import Loader from './Loader/Loader.jsx';
-import { Modal } from './Modal/Modal.jsx';
+import { Component } from 'react';
+import ButtonLoaderMore from './Button/Button';
+import ImageGallery from './ImageGallery/ImageGallery';
+import Loader from './Loader/Loader';
+import Modal from './Modal/Modal';
+import Searchbar from './Searchbar/Searchbar';
 
-export class App extends React.Component {
+import { searchImg } from 'services/image-api';
+import css from './styles.module.css';
+
+class App extends Component {
   state = {
-    name: '',
+    gallery: [],
+    error: null,
     page: 1,
-    images: [],
-    isLoading: false,
-    currentImage: { src: '', alt: '' },
-    endSearch: false,
-    error: false,
+    nameImg: '',
+    showModal: false,
+    url: '',
+    tags: '',
+    loading: false,
+    total: 0,
   };
 
   componentDidUpdate(_, prevState) {
-    if (
-      prevState.name !== this.state.name ||
-      prevState.page !== this.state.page
-    ) {
-      this.setState({ isLoading: true });
-      this.query();
+    const { nameImg, page } = this.state;
+
+    if (nameImg !== prevState.nameImg || page !== prevState.page) {
+      this.setState({ loading: true });
+      this.fetchPosts();
     }
   }
 
-  query = () => {
+  async fetchPosts() {
     try {
-      fetch(
-        `https://pixabay.com/api/?q=${this.state.name}&page=${this.state.page}&key=31147704-3d6790a6d451c63a87a2b7851&image_type=photo&orientation=horizontal&per_page=12`
-      )
-        .then(resp => resp.json())
-        .then(resp => {
-          if (resp.hits.length === 0) {
-            this.setState({ error: true });
-            return;
-          }
+      const { nameImg, page } = this.state;
+      const data = await searchImg(nameImg, page);
 
-          this.setState(prevState => {
-            return { images: [...prevState.images, ...resp.hits] };
-          });
-
-          if (resp.totalHits <= this.state.images.length + resp.hits.length) {
-            this.setState({ endSearch: true });
-          }
-        });
+      this.setState(({ gallery }) => {
+        return {
+          gallery: [...gallery, ...data.hits],
+          total: data.totalHits,
+        };
+      });
+    } catch (error) {
+      this.setState({ error: error.message });
     } finally {
-      this.setState({ isLoading: false });
+      this.setState({ loading: false });
+    }
+  }
+  loaderMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+
+  modalOpen = (url, tags) => {
+    this.setState(prev => ({ showModal: !prev.showModal, url, tags }));
+  };
+
+  modalClose = e => {
+    if (e.code === 'Escape' || e.currentTarget === e.target) {
+      this.setState(prev => ({ showModal: !prev.showModal }));
     }
   };
-
-  onSubmit = name => {
-    this.setState({
-      name,
-      page: 1,
-      images: [],
-      endSearch: false,
-      error: false,
-    });
-  };
-
-  onLoadMore = () => {
-    this.setState(prevState => {
-      return {
-        page: prevState.page + 1,
-      };
-    });
-  };
-
-  resetCurrentImage = () => {
-    this.setState({
-      currentImage: { src: '', alt: '' },
-    });
-  };
-
-  onModal = currentImage => {
-    this.setState({ currentImage });
+  searchInput = nameImg => {
+    if (nameImg === this.state.nameImg) {
+      return;
+    }
+    this.setState({ nameImg, gallery: [], page: 1 });
   };
 
   render() {
-    const { error, images, isLoading, endSearch, currentImage } = this.state;
+    const { gallery, error, showModal, url, tags, loading, total, page } =
+      this.state;
+    const totalPage = Math.ceil(total / 12);
+
     return (
       <div
         style={{
@@ -93,22 +84,23 @@ export class App extends React.Component {
           textAlign: 'center',
         }}
       >
-        <Searchbar onSubmit={this.onSubmit} />
-        {error && <p>There aren't any results</p>}
-        {images.length > 0 && (
-          <ImageGallery images={images} onModal={this.onModal} />
+        <Searchbar onSubmit={this.searchInput} />
+        <ImageGallery onClick={this.modalOpen} gallery={gallery} />
+
+        {error && <h2 className={css.title}>{error}</h2>}
+        {loading && <Loader text="Loading..." />}
+
+        {Boolean(gallery.length) && page < totalPage && (
+          <ButtonLoaderMore loader={this.loaderMore} type="button" />
         )}
-        {isLoading && <Loader />}
-        {images.length > 0 && !endSearch && (
-          <Button onLoadMore={this.onLoadMore} />
-        )}
-        {this.state.currentImage.src && (
-          <Modal
-            currentImage={currentImage}
-            resetCurrentImage={this.resetCurrentImage}
-          />
+        {showModal && (
+          <Modal onClose={this.modalClose}>
+            <img src={url} alt={tags} />
+          </Modal>
         )}
       </div>
     );
   }
 }
+
+export default App;
